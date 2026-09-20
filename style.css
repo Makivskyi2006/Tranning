@@ -112,3 +112,9 @@ body.has-timer #tBtn{display:none}
 .vid svg{width:18px;height:18px;fill:currentColor;margin-left:2px}
 .vid:active{transform:scale(.92)}
 .wu{margin:0 0 12px;text-decoration:none}
+.bw input{min-width:0;width:100%}
+.bw .btn{flex:none;padding:0 18px}
+.row.ex{gap:12px}
+.row.ex .t{flex:1;width:auto;min-width:0;text-align:left;color:var(--tx);overflow-wrap:anywhere}
+.row.ex .v{flex:none}
+.card{overflow:hidden}
