@@ -8,6 +8,9 @@ let S = (() => {
   try { const v = JSON.parse(localStorage.getItem(KEY)); if (v && v.logs) return v; } catch (e) {}
   return { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 };
 })();
+// миграция со старой 5-недельной версии: вернуть позицию в круг из трёх и сбросить незавершённую старую тренировку
+S.pos = ((S.pos % WORKOUTS.length) + WORKOUTS.length) % WORKOUTS.length;
+if (S.active && !ALL_WORKOUTS.some(x => x.id === S.active.wid)) S.active = null;
 let view = 'home', exSel = null, timer = null, wakeLock = null, sheet = null;
 
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
@@ -78,7 +81,7 @@ setInterval(renderTimer, 250);
 
 /* ---------- тренировка ---------- */
 function startWorkout(wid) {
-  const w = WORKOUTS.find(x => x.id === wid);
+  const w = ALL_WORKOUTS.find(x => x.id === wid);
   S.active = {
     wid, title: w.title, startedAt: Date.now(),
     ex: w.ex.map(e => {
@@ -124,9 +127,8 @@ function finishWorkout() {
   const volume = ex.reduce((n, e) => n + e.sets.reduce((m, s) => m + s.w * s.r, 0), 0);
   const log = { id: 'l' + Date.now(), date: new Date().toISOString(), wid: a.wid, title: a.title, dur: Math.round((Date.now() - a.startedAt) / 60000), ex };
   S.logs.push(log);
-  if (WORKOUTS[S.pos % WORKOUTS.length] && WORKOUTS[S.pos % WORKOUTS.length].id === a.wid) {
-    S.pos++; if (S.pos >= WORKOUTS.length) { S.pos = 0; S.cycle++; }
-  }
+  const wi = WORKOUTS.findIndex(x => x.id === a.wid);
+  if (wi >= 0) { S.pos = wi + 1; if (S.pos >= WORKOUTS.length) { S.pos = 0; S.cycle++; } }
   S.active = null; save(); stopTimer();
   try { wakeLock && wakeLock.release(); } catch (e) {}
   view = 'home';
@@ -151,7 +153,7 @@ function vHome() {
   const nxt = wByPos();
   const a = S.active;
   const wk = S.logs.filter(l => Date.now() - new Date(l.date) < 7 * 864e5).length;
-  let h = `<div class="stats"><div><b>${wk}</b><span>7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>цикл</span></div></div>`;
+  let h = `<div class="stats"><div><b>${wk}</b><span>7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>неделя</span></div></div>`;
   if (a) {
     h += `<div class="hero"><h2>${esc(a.title)}</h2>
       <button class="big" data-a="resume">Продолжить</button></div>`;
@@ -160,22 +162,21 @@ function vHome() {
       <button class="big" data-a="start" data-id="${nxt.id}">Начать</button></div>`;
   }
   h += `<h3>План</h3><div class="plan">`;
-  let cur = '';
   WORKOUTS.forEach((w, i) => {
-    if (w.block !== cur) { cur = w.block; h += `<div class="blk">${esc(cur)}</div>`; }
-    const done = i < S.pos, isNext = i === S.pos % WORKOUTS.length;
+    const done = i < S.pos % WORKOUTS.length, isNext = i === S.pos % WORKOUTS.length;
     h += `<button class="row ${done ? 'done' : ''} ${isNext ? 'next' : ''}" data-a="pick" data-i="${i}">
-      <span>${done ? '✓' : isNext ? '▶' : '•'}</span><span>${esc(w.title.split(' · ').slice(1).join(' · '))}</span></button>`;
+      <span>${done ? '✓' : isNext ? '▶' : '•'}</span><span>${esc(w.title)}</span></button>`;
   });
+  h += `<div class="blk">Разгрузка</div>` + EXTRA.map(w => `<button class="row" data-a="start" data-id="${w.id}"><span>•</span><span>${esc(w.title.replace('Разгрузка · ', ''))}</span></button>`).join('');
   h += `</div>`;
   return h;
 }
 
 function vWorkout() {
-  const a = S.active, w = WORKOUTS.find(x => x.id === a.wid);
+  const a = S.active, w = ALL_WORKOUTS.find(x => x.id === a.wid);
   const mins = Math.floor((Date.now() - a.startedAt) / 60000);
   let h = `<div class="wh"><div><h1>${esc(a.title)}</h1><small>${mins} мин · ${a.ex.reduce((n, e) => n + e.sets.filter(s => s.done).length, 0)}/${a.ex.reduce((n, e) => n + e.sets.length, 0)} подходов</small></div></div>`;
-  const wu = w.kind === 'Ноги' ? WARMUP.lower : WARMUP.upper;
+  const wu = /^Ноги/.test(w.kind) ? WARMUP.lower : WARMUP.upper;
   if (wu) h += `<a class="btn wide alt wu" href="${wu}" target="_blank" rel="noopener">Разминка</a>`;
   a.ex.forEach((e, ei) => {
     const p = w.ex[ei];
@@ -344,7 +345,7 @@ document.addEventListener('click', ev => {
       // следующий подход: подставить вес и повторы из только что выполненного
       const nx = A.ex[ei].sets[si + 1];
       if (nx && !nx.done && nx.w === '') { nx.w = s.w; const ni = row.nextElementSibling; if (ni) ni.querySelector('[data-k="w"]').value = s.w; }
-      const w = WORKOUTS.find(x => x.id === A.wid), p = w.ex[ei];
+      const w = ALL_WORKOUTS.find(x => x.id === A.wid), p = w.ex[ei];
       const lastSet = ei === A.ex.length - 1 && si === A.ex[ei].sets.length - 1;
       if (!lastSet) startTimer(p.rest); else stopTimer();
       return;
