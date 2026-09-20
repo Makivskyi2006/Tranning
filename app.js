@@ -175,6 +175,8 @@ function vWorkout() {
   const a = S.active, w = WORKOUTS.find(x => x.id === a.wid);
   const mins = Math.floor((Date.now() - a.startedAt) / 60000);
   let h = `<div class="wh"><div><h1>${esc(a.title)}</h1><small>${mins} мин · ${a.ex.reduce((n, e) => n + e.sets.filter(s => s.done).length, 0)}/${a.ex.reduce((n, e) => n + e.sets.length, 0)} подходов</small></div></div>`;
+  const wu = w.kind === 'Ноги' ? WARMUP.lower : WARMUP.upper;
+  if (wu) h += `<a class="btn wide alt wu" href="${wu}" target="_blank" rel="noopener">Разминка</a>`;
   a.ex.forEach((e, ei) => {
     const p = w.ex[ei];
     const last = lastLogFor(e.name);
@@ -186,7 +188,7 @@ function vWorkout() {
         hint += ` <b class="up">↑ добавь вес</b>`;
     }
     h += `<section class="card" data-e="${ei}">
-      <div class="exh"><h2>${ei + 1}. ${esc(e.name)}</h2>
+      <div class="exh"><div class="eh"><h2>${ei + 1}. ${esc(e.name)}</h2>${VIDEO[e.name] ? `<a class="vid" href="${VIDEO[e.name]}" target="_blank" rel="noopener" aria-label="Видео техники"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></a>` : ''}</div>
         <div class="chips"><span>${p.sets}×${esc(p.reps)}</span><span>${p.rest >= 60 ? p.rest / 60 + ' мин' : p.rest + ' сек'}</span>${p.rir == null ? '' : `<span>ЗДО ${p.rir}</span>`}</div></div>
       ${hint ? `<div class="last">${hint}</div>` : ''}
       ${p.note ? `<div class="note">${esc(p.note)}</div>` : ''}

@@ -105,3 +105,10 @@ dl{margin:0;font-size:14px}dt{font-weight:700;color:var(--acc);margin-top:10px}d
 #tBtn svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 #tBtn:active{transform:scale(.94)}
 body.has-timer #tBtn{display:none}
+
+.eh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.eh h2{flex:1}
+.vid{flex:none;width:40px;height:40px;border-radius:50%;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;margin-top:-2px}
+.vid svg{width:18px;height:18px;fill:currentColor;margin-left:2px}
+.vid:active{transform:scale(.92)}
+.wu{margin:0 0 12px;text-decoration:none}
