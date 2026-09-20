@@ -108,11 +108,11 @@ function finishWorkout() {
     sets: e.sets.filter(s => s.done).map(s => ({ w: num(s.w) || 0, r: num(s.r) || 0 })),
   })).filter(e => e.sets.length);
   if (!ex.length) {
-    if (confirm('Ни один подход не отмечен. Сбросить тренировку?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); }
+    if (confirm('Сбросить тренировку?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); }
     return;
   }
   const left = a.ex.reduce((n, e) => n + e.sets.filter(s => !s.done).length, 0);
-  if (left && !confirm(`Не отмечено подходов: ${left}. Завершить всё равно?`)) return;
+  if (left && !confirm(`Не отмечено: ${left}. Завершить?`)) return;
 
   // рекорды: сравниваем расчётный максимум на 1 повторение с прошлыми тренировками
   const prs = [];
@@ -151,17 +151,15 @@ function vHome() {
   const nxt = wByPos();
   const a = S.active;
   const wk = S.logs.filter(l => Date.now() - new Date(l.date) < 7 * 864e5).length;
-  let h = `<h1>Тренировки</h1>
-  <div class="stats"><div><b>${wk}</b><span>за 7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>цикл</span></div></div>`;
+  let h = `<div class="stats"><div><b>${wk}</b><span>7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>цикл</span></div></div>`;
   if (a) {
-    h += `<div class="hero"><small>Идёт тренировка</small><h2>${esc(a.title)}</h2>
+    h += `<div class="hero"><small>Сейчас</small><h2>${esc(a.title)}</h2>
       <button class="big" data-a="resume">Продолжить</button></div>`;
   } else {
-    h += `<div class="hero"><small>Следующая тренировка</small><h2>${esc(nxt.title)}</h2>
-      <ol class="mini">${nxt.ex.map(e => `<li>${esc(e.name)} <i>${e.sets}×${esc(e.reps)}</i></li>`).join('')}</ol>
-      <button class="big" data-a="start" data-id="${nxt.id}">Начать тренировку</button></div>`;
+    h += `<div class="hero"><small>Дальше</small><h2>${esc(nxt.title)}</h2>
+      <button class="big" data-a="start" data-id="${nxt.id}">Начать</button></div>`;
   }
-  h += `<h3>Вся программа</h3><div class="plan">`;
+  h += `<h3>План</h3><div class="plan">`;
   let cur = '';
   WORKOUTS.forEach((w, i) => {
     if (w.block !== cur) { cur = w.block; h += `<div class="blk">${esc(cur)}</div>`; }
@@ -169,7 +167,7 @@ function vHome() {
     h += `<button class="row ${done ? 'done' : ''} ${isNext ? 'next' : ''}" data-a="pick" data-i="${i}">
       <span>${done ? '✓' : isNext ? '▶' : '•'}</span><span>${esc(w.title.split(' · ').slice(1).join(' · '))}</span></button>`;
   });
-  h += `</div><p class="hint">Тапни любой день, чтобы сделать его следующим.</p>`;
+  h += `</div>`;
   return h;
 }
 
@@ -181,16 +179,16 @@ function vWorkout() {
     const p = w.ex[ei];
     const last = lastLogFor(e.name);
     const [, hi] = repRange(p.reps);
-    let hint = '<span class="new">Первый раз — подбери рабочий вес</span>';
+    let hint = '';
     if (last) {
-      hint = 'Прошлый раз: ' + last.ex.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ');
+      hint = 'Было: ' + last.ex.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ');
       if (!isNaN(hi) && hi && !/сек|макс/.test(p.reps) && last.ex.sets.length >= Math.min(p.sets, 2) && last.ex.sets.every(s => s.r >= hi))
-        hint += ` <b class="up">↑ все подходы на верхней границе — добавь вес</b>`;
+        hint += ` <b class="up">↑ добавь вес</b>`;
     }
     h += `<section class="card" data-e="${ei}">
       <div class="exh"><h2>${ei + 1}. ${esc(e.name)}</h2>
-        <div class="chips"><span>${p.sets}×${esc(p.reps)}</span><span>отдых ${p.rest >= 60 ? p.rest / 60 + ' мин' : p.rest + ' сек'}</span>${p.rir == null ? '' : `<span>ЗДО ${p.rir}</span>`}</div></div>
-      <div class="last">${hint}</div>
+        <div class="chips"><span>${p.sets}×${esc(p.reps)}</span><span>${p.rest >= 60 ? p.rest / 60 + ' мин' : p.rest + ' сек'}</span>${p.rir == null ? '' : `<span>ЗДО ${p.rir}</span>`}</div></div>
+      ${hint ? `<div class="last">${hint}</div>` : ''}
       ${p.note ? `<div class="note">${esc(p.note)}</div>` : ''}
       ${p.warm ? `<div class="warm" id="warm${ei}"></div>` : ''}
       <div class="sets">${e.sets.map((s, si) => setRow(ei, si, s)).join('')}</div>
@@ -198,8 +196,8 @@ function vWorkout() {
       ${e.sets.length > 1 ? `<button class="link dim" data-a="delset" data-e="${ei}">− подход</button>` : ''}
     </section>`;
   });
-  h += `<button class="big fin" data-a="finish">Завершить тренировку</button>
-        <button class="link dim center" data-a="cancel">Отменить тренировку</button>`;
+  h += `<button class="big fin" data-a="finish">Завершить</button>
+        <button class="link dim center" data-a="cancel">Отмена</button>`;
   return h;
 }
 function setRow(ei, si, s) {
@@ -213,17 +211,17 @@ function updateWarm(ei) {
   const el = $('#warm' + ei); if (!el) return;
   const w = num(S.active.ex[ei].sets[0].w);
   el.innerHTML = w > 0
-    ? `<b>Разминка:</b> гриф ×15-20 · ${fmt(r25(w * .4))} ×8-10 · ${fmt(r25(w * .7))} ×4-5 · ${fmt(r25(w * .9))} ×2`
-    : `<b>Разминка:</b> введи рабочий вес — подскажу подходы`;
+    ? `<b>Разминка</b> ${fmt(r25(w * .4))}×8-10 · ${fmt(r25(w * .7))}×4-5 · ${fmt(r25(w * .9))}×2`
+    : '';
 }
 
 function vHistory() {
-  if (!S.logs.length) return `<h1>История</h1><p class="empty">Пока пусто. Заверши первую тренировку — она появится здесь.</p>`;
+  if (!S.logs.length) return `<h1>История</h1><p class="empty">Пусто</p>`;
   return `<h1>История</h1>` + S.logs.slice().reverse().map(l => {
     const vol = l.ex.reduce((n, e) => n + e.sets.reduce((m, s) => m + s.w * s.r, 0), 0);
-    return `<details class="card"><summary><b>${esc(l.title)}</b><small>${dLong(l.date)} · ${l.dur} мин · ${Math.round(vol).toLocaleString('ru-RU')} кг объём</small></summary>
+    return `<details class="card"><summary><b>${esc(l.title)}</b><small>${dLong(l.date)} · ${Math.round(vol).toLocaleString('ru-RU')} кг</small></summary>
       ${l.ex.map(e => `<div class="hx"><b>${esc(e.name)}</b><span>${e.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}
-      <button class="link dim" data-a="dellog" data-id="${l.id}">Удалить запись</button></details>`;
+      <button class="link dim" data-a="dellog" data-id="${l.id}">Удалить</button></details>`;
   }).join('');
 }
 
@@ -244,9 +242,9 @@ function vProgress() {
   <section class="card"><h2>Вес тела</h2>
     <div class="bw"><input id="bwIn" inputmode="decimal" placeholder="кг"><button class="btn" data-a="bw">Записать</button></div>
     ${bw.length > 1 ? chart(bw.map(b => ({ d: b.d, v: b.v })), 'кг') : ''}
-    ${bw.length ? `<div class="last">Последнее: <b>${fmt(bw[bw.length - 1].v)} кг</b> · ${dShort(bw[bw.length - 1].d)}${bw.length > 1 ? ` · с начала ${signed(bw[bw.length - 1].v - bw[0].v)} кг` : ''}</div>` : ''}
+    ${bw.length ? `<div class="last"><b>${fmt(bw[bw.length - 1].v)} кг</b> · ${dShort(bw[bw.length - 1].d)}</div>` : ''}
   </section><h3>Упражнения</h3>`;
-  if (!items.length) return h + `<p class="empty">Здесь появятся графики, когда будут записаны тренировки.</p>`;
+  if (!items.length) return h + `<p class="empty">Пусто</p>`;
   h += items.map(({ n, p }) => {
     const f = p[0], l = p[p.length - 1], diff = l.w - f.w;
     return `<button class="row ex" data-a="openex" data-n="${esc(n)}"><span class="t">${esc(n)}</span><span class="v"><b>${fmt(l.w)} кг</b>${p.length > 1 ? `<i class="${diff >= 0 ? 'pos' : 'neg'}">${signed(diff)}</i>` : ''}</span></button>`;
@@ -258,10 +256,10 @@ function vEx() {
   const p = exStats(exSel);
   const bestW = Math.max(...p.map(x => x.w)), bestE = Math.max(...p.map(x => x.e));
   return `<button class="link back" data-a="back">← Назад</button><h1>${esc(exSel)}</h1>
-  <div class="stats"><div><b>${fmt(bestW)}</b><span>макс. вес, кг</span></div><div><b>${fmt(bestE)}</b><span>расч. 1ПМ, кг</span></div><div><b>${p.length}</b><span>тренировок</span></div></div>
-  <section class="card"><h2>Рабочий вес (макс. в тренировке)</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.w })), 'кг') : '<p class="empty">Нужно минимум 2 тренировки для графика.</p>'}</section>
-  <section class="card"><h2>Расчётный максимум (1ПМ)</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.e })), 'кг') : ''}</section>
-  <h3>Все записи</h3>${p.slice().reverse().map(x => `<div class="hx"><b>${dShort(x.d)}</b><span>${x.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}`;
+  <div class="stats"><div><b>${fmt(bestW)}</b><span>макс, кг</span></div><div><b>${fmt(bestE)}</b><span>1ПМ, кг</span></div><div><b>${p.length}</b><span>раз</span></div></div>
+  <section class="card"><h2>Вес</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.w })), 'кг') : ''}</section>
+  <section class="card"><h2>1ПМ</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.e })), 'кг') : ''}</section>
+  <h3>Записи</h3>${p.slice().reverse().map(x => `<div class="hx"><b>${dShort(x.d)}</b><span>${x.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}`;
 }
 function chart(pts, unit) {
   const W = 340, H = 150, pl = 34, pr = 8, pt = 10, pb = 22;
@@ -282,31 +280,26 @@ function chart(pts, unit) {
 
 function vMore() {
   return `<h1>Ещё</h1>
-  <section class="card"><h2>Шаг веса</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)} кг</button>`).join('')}</div>
-  <div class="last">На сколько меняют вес кнопки − и + рядом с подходом.</div></section>
-  <section class="card"><h2>Таймер отдыха</h2><div class="seg t">${[30, 60, 90, 120, 180, 240].map(s => `<button data-a="tset" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
-  <div class="last">Во время тренировки таймер запускается сам после отметки подхода — с отдыхом из программы.</div></section>
-  <section class="card"><h2>Как читать программу</h2><dl>
-    <dt>ЗДО</dt><dd>Запас до отказа. ЗДО 0 — подход в отказ, ЗДО 1 — остановись за 1 повтор до отказа.</dd>
-    <dt>Р (разминка)</dt><dd>Упражнения с пометкой «Разминка» — сначала разминочные подходы (расчёт показан в карточке).</dd>
-    <dt>3×12-10-8</dt><dd>Пирамида: с каждым подходом чуть больше вес и меньше повторений.</dd>
-    <dt>Дропсет</dt><dd>Подход без отдыха: сделал до максимума → −30% веса → снова до максимума → ещё раз −30%.</dd>
-    <dt>Темп</dt><dd>Вверх — быстро и с максимальным усилием, вниз — подконтрольно ~2 сек, полная амплитуда.</dd>
-    <dt>Разгрузка</dt><dd>Неделя лёгких тренировок: ~50% рабочих весов, чистая техника.</dd></dl></section>
-  <section class="card"><h2>Данные</h2><p class="last">Данные хранятся только на этом телефоне. Делай резервную копию — если очистить данные Safari, история пропадёт.</p>
-    <button class="btn wide" data-a="export">Сохранить копию (файл)</button>
-    <label class="btn wide alt">Восстановить из файла<input type="file" id="imp" accept="application/json,.json" hidden></label>
-    <button class="btn wide danger" data-a="restart">Начать цикл заново (историю не трогать)</button>
-    <button class="btn wide danger" data-a="wipe">Стереть все данные</button></section>`;
+  <section class="card"><h2>Шаг веса</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)}</button>`).join('')}</div></section>
+  <section class="card"><h2>Таймер</h2><div class="seg t">${[30, 60, 90, 120, 180, 240].map(s => `<button data-a="tset" data-s="${s}">${mmss(s)}</button>`).join('')}</div></section>
+  <section class="card"><h2>Памятка</h2><dl>
+    <dt>ЗДО</dt><dd>Запас до отказа: 0 — в отказ, 1 — за 1 повтор до него.</dd>
+    <dt>Дропсет</dt><dd>До максимума, −30% веса, снова до максимума, ещё раз.</dd>
+    <dt>Темп</dt><dd>Вверх быстро, вниз ~2 сек, полная амплитуда.</dd></dl></section>
+  <section class="card"><h2>Данные</h2>
+    <button class="btn wide" data-a="export">Сохранить копию</button>
+    <label class="btn wide alt">Восстановить<input type="file" id="imp" accept="application/json,.json" hidden></label>
+    <button class="btn wide danger" data-a="restart">Цикл с начала</button>
+    <button class="btn wide danger" data-a="wipe">Стереть всё</button></section>`;
 }
 
 function vSheet() {
   if (sheet.type === 'summary') {
     const l = sheet.log;
-    return `<div class="panel"><h2>Готово</h2><p>${esc(l.title)}</p>
-      <div class="stats"><div><b>${l.dur}</b><span>минут</span></div><div><b>${Math.round(sheet.volume).toLocaleString('ru-RU')}</b><span>кг объём</span></div><div><b>${l.ex.reduce((n, e) => n + e.sets.length, 0)}</b><span>подходов</span></div></div>
+    return `<div class="panel"><h2>Готово</h2>
+      <div class="stats"><div><b>${l.dur}</b><span>мин</span></div><div><b>${Math.round(sheet.volume).toLocaleString('ru-RU')}</b><span>кг</span></div><div><b>${l.ex.reduce((n, e) => n + e.sets.length, 0)}</b><span>подх.</span></div></div>
       ${sheet.prs.length ? `<div class="prs"><b>Новые рекорды</b>${sheet.prs.map(n => `<div>${esc(n)}</div>`).join('')}</div>` : ''}
-      <button class="big" data-a="closesheet">Отлично</button></div>`;
+      <button class="big" data-a="closesheet">Ок</button></div>`;
   }
   if (sheet.type === 'timer') {
     return `<div class="panel"><h2>Таймер</h2><div class="seg t big">${[30, 60, 90, 120, 180, 240, 300].map(s => `<button data-a="tstart" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
@@ -353,7 +346,7 @@ document.addEventListener('click', ev => {
     case 'addset': { const ss = A.ex[ei].sets, l = ss[ss.length - 1]; ss.push({ w: l.w, r: l.r, done: false }); save(); keepScroll(); return; }
     case 'delset': { const ss = A.ex[ei].sets; if (ss.length > 1) ss.pop(); save(); keepScroll(); return; }
     case 'finish': finishWorkout(); return;
-    case 'cancel': if (confirm('Отменить тренировку? Записанные подходы пропадут.')) { S.active = null; save(); stopTimer(); view = 'home'; render(); } return;
+    case 'cancel': if (confirm('Отменить тренировку?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); } return;
     case 'closesheet': sheet = null; render(); return;
     case 'timersheet': sheet = { type: 'timer' }; render(); return;
     case 'tstart': sheet = null; startTimer(+b.dataset.s); render(); return;
@@ -362,12 +355,12 @@ document.addEventListener('click', ev => {
     case 'tstop': stopTimer(); return;
     case 'openex': exSel = b.dataset.n; view = 'ex'; render(); window.scrollTo(0, 0); return;
     case 'back': view = 'progress'; render(); return;
-    case 'dellog': if (confirm('Удалить эту тренировку из истории?')) { S.logs = S.logs.filter(l => l.id !== b.dataset.id); save(); render(); } return;
+    case 'dellog': if (confirm('Удалить запись?')) { S.logs = S.logs.filter(l => l.id !== b.dataset.id); save(); render(); } return;
     case 'bw': { const v = num($('#bwIn').value); if (v > 20 && v < 400) { S.body.push({ d: new Date().toISOString(), v }); save(); render(); toast('Записано'); } else toast('Введи вес в кг'); return; }
     case 'stepset': S.step = +b.dataset.v; save(); render(); return;
     case 'export': exportData(); return;
-    case 'restart': if (confirm('Вернуться к неделе 1, дню 1?')) { S.pos = 0; S.cycle++; save(); toast('Готово'); } return;
-    case 'wipe': if (confirm('Стереть ВСЕ данные без возможности восстановления?') && confirm('Точно стереть?')) { S = { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 }; save(); stopTimer(); view = 'home'; render(); } return;
+    case 'restart': if (confirm('Начать цикл с начала?')) { S.pos = 0; S.cycle++; save(); toast('Готово'); } return;
+    case 'wipe': if (confirm('Стереть все данные?') && confirm('Точно стереть?')) { S = { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 }; save(); stopTimer(); view = 'home'; render(); } return;
   }
 });
 function keepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
@@ -387,7 +380,7 @@ document.addEventListener('change', ev => {
     try {
       const d = JSON.parse(rd.result);
       if (!d || !Array.isArray(d.logs)) throw 0;
-      if (!confirm(`Заменить текущие данные копией? В файле тренировок: ${d.logs.length}`)) return;
+      if (!confirm(`Заменить данные копией (${d.logs.length})?`)) return;
       S = Object.assign({ pos: 0, cycle: 1, active: null, body: [], step: 2.5 }, d); save(); render(); toast('Восстановлено');
     } catch (e) { alert('Не удалось прочитать файл'); }
   };

@@ -95,3 +95,4 @@ dl{margin:0;font-size:14px}dt{font-weight:700;color:var(--acc);margin-top:10px}d
 #toast{position:fixed;left:50%;bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 90px);transform:translateX(-50%);background:#fff;color:#111;padding:10px 16px;border-radius:20px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
 #toast.on{opacity:1}
 @media (min-width:600px){body{background:#0a0a0a}}
+.warm:empty{display:none}
