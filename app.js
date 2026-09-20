@@ -151,7 +151,7 @@ function vHome() {
   const nxt = wByPos();
   const a = S.active;
   const wk = S.logs.filter(l => Date.now() - new Date(l.date) < 7 * 864e5).length;
-  let h = `<h1>Привет 👋</h1>
+  let h = `<h1>Тренировки</h1>
   <div class="stats"><div><b>${wk}</b><span>за 7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>цикл</span></div></div>`;
   if (a) {
     h += `<div class="hero"><small>Идёт тренировка</small><h2>${esc(a.title)}</h2>
@@ -303,9 +303,9 @@ function vMore() {
 function vSheet() {
   if (sheet.type === 'summary') {
     const l = sheet.log;
-    return `<div class="panel"><h2>Готово! 💪</h2><p>${esc(l.title)}</p>
+    return `<div class="panel"><h2>Готово</h2><p>${esc(l.title)}</p>
       <div class="stats"><div><b>${l.dur}</b><span>минут</span></div><div><b>${Math.round(sheet.volume).toLocaleString('ru-RU')}</b><span>кг объём</span></div><div><b>${l.ex.reduce((n, e) => n + e.sets.length, 0)}</b><span>подходов</span></div></div>
-      ${sheet.prs.length ? `<div class="prs"><b>🏆 Новые рекорды</b>${sheet.prs.map(n => `<div>${esc(n)}</div>`).join('')}</div>` : ''}
+      ${sheet.prs.length ? `<div class="prs"><b>Новые рекорды</b>${sheet.prs.map(n => `<div>${esc(n)}</div>`).join('')}</div>` : ''}
       <button class="big" data-a="closesheet">Отлично</button></div>`;
   }
   if (sheet.type === 'timer') {
