@@ -245,12 +245,16 @@ function vProgress() {
     <div class="bw"><input id="bwIn" inputmode="decimal" placeholder="кг"><button class="btn" data-a="bw">Записать</button></div>
     ${bw.length > 1 ? chart(bw.map(b => ({ d: b.d, v: b.v })), 'кг') : ''}
     ${bw.length ? `<div class="last"><b>${fmt(bw[bw.length - 1].v)} кг</b> · ${dShort(bw[bw.length - 1].d)}</div>` : ''}
-  </section><h3>Упражнения</h3>`;
+  </section>`;
   if (!items.length) return h + `<p class="empty">Пусто</p>`;
-  h += items.map(({ n, p }) => {
+  const rowOf = ({ n, p }) => {
     const f = p[0], l = p[p.length - 1], diff = l.w - f.w;
     return `<button class="row ex" data-a="openex" data-n="${esc(n)}"><span class="t">${esc(n)}</span><span class="v"><b>${fmt(l.w)} кг</b>${p.length > 1 ? `<i class="${diff >= 0 ? 'pos' : 'neg'}">${signed(diff)}</i>` : ''}</span></button>`;
-  }).join('');
+  };
+  [...GROUPS, 'Другое'].forEach(g => {
+    const list = items.filter(it => groupOf(it.n) === g);
+    if (list.length) h += `<h3>${g}</h3>` + list.map(rowOf).join('');
+  });
   return h;
 }
 const signed = n => (n > 0 ? '+' : n < 0 ? '−' : '') + fmt(Math.abs(n));
