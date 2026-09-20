@@ -279,8 +279,7 @@ function chart(pts, unit) {
 }
 
 function vMore() {
-  return `<h1>Ещё</h1>
-  <section class="card"><h2>Шаг веса</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)}</button>`).join('')}</div></section>
+  return `<section class="card"><h2>Шаг веса</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)}</button>`).join('')}</div></section>
   <section class="card"><h2>Таймер</h2><div class="seg t">${[30, 60, 90, 120, 180, 240].map(s => `<button data-a="tset" data-s="${s}">${mmss(s)}</button>`).join('')}</div></section>
   <section class="card"><h2>Памятка</h2><dl>
     <dt>ЗДО</dt><dd>Запас до отказа: 0 — в отказ, 1 — за 1 повтор до него.</dd>
