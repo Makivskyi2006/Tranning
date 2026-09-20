@@ -295,7 +295,6 @@ function vMore() {
   <section class="card"><h2>Данные</h2>
     <button class="btn wide" data-a="export">Сохранить копию</button>
     <label class="btn wide alt">Восстановить<input type="file" id="imp" accept="application/json,.json" hidden></label>
-    <button class="btn wide danger" data-a="restart">Цикл с начала</button>
     <button class="btn wide danger" data-a="wipe">Стереть всё</button></section>`;
 }
 
@@ -367,7 +366,6 @@ document.addEventListener('click', ev => {
     case 'bw': { const v = num($('#bwIn').value); if (v > 20 && v < 400) { S.body.push({ d: new Date().toISOString(), v }); save(); render(); toast('Записано'); } else toast('Введи вес в кг'); return; }
     case 'stepset': S.step = +b.dataset.v; save(); render(); return;
     case 'export': exportData(); return;
-    case 'restart': if (confirm('Начать цикл с начала?')) { S.pos = 0; S.cycle++; save(); toast('Готово'); } return;
     case 'wipe': if (confirm('Стереть все данные?') && confirm('Точно стереть?')) { S = { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 }; save(); stopTimer(); view = 'home'; render(); } return;
   }
 });
