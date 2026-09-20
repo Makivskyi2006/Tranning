@@ -174,7 +174,8 @@ function vHome() {
 function vWorkout() {
   const a = S.active, w = ALL_WORKOUTS.find(x => x.id === a.wid);
   const mins = Math.floor((Date.now() - a.startedAt) / 60000);
-  let h = `<div class="wh"><div><h1>${esc(a.title)}</h1><small>${mins} мин · ${a.ex.reduce((n, e) => n + e.sets.filter(s => s.done).length, 0)}/${a.ex.reduce((n, e) => n + e.sets.length, 0)} подходов</small></div></div>`;
+  let h = `<button class="link back" data-a="home">← Назад</button>
+  <div class="wh"><div><h1>${esc(a.title)}</h1><small>${mins} мин · ${a.ex.reduce((n, e) => n + e.sets.filter(s => s.done).length, 0)}/${a.ex.reduce((n, e) => n + e.sets.length, 0)} подходов</small></div></div>`;
   const wu = /^Ноги/.test(w.kind) ? WARMUP.lower : WARMUP.upper;
   if (wu) h += `<a class="btn wide alt wu" href="${wu}" target="_blank" rel="noopener">Разминка</a>`;
   a.ex.forEach((e, ei) => {
@@ -361,6 +362,7 @@ document.addEventListener('click', ev => {
     case 'tstop': stopTimer(); return;
     case 'openex': exSel = b.dataset.n; view = 'ex'; render(); window.scrollTo(0, 0); return;
     case 'back': view = 'progress'; render(); return;
+    case 'home': view = 'home'; render(); window.scrollTo(0, 0); return;
     case 'dellog': if (confirm('Удалить запись?')) { S.logs = S.logs.filter(l => l.id !== b.dataset.id); save(); render(); } return;
     case 'bw': { const v = num($('#bwIn').value); if (v > 20 && v < 400) { S.body.push({ d: new Date().toISOString(), v }); save(); render(); toast('Записано'); } else toast('Введи вес в кг'); return; }
     case 'stepset': S.step = +b.dataset.v; save(); render(); return;
