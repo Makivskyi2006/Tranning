@@ -153,10 +153,10 @@ function vHome() {
   const wk = S.logs.filter(l => Date.now() - new Date(l.date) < 7 * 864e5).length;
   let h = `<div class="stats"><div><b>${wk}</b><span>7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>цикл</span></div></div>`;
   if (a) {
-    h += `<div class="hero"><small>Сейчас</small><h2>${esc(a.title)}</h2>
+    h += `<div class="hero"><h2>${esc(a.title)}</h2>
       <button class="big" data-a="resume">Продолжить</button></div>`;
   } else {
-    h += `<div class="hero"><small>Дальше</small><h2>${esc(nxt.title)}</h2>
+    h += `<div class="hero"><h2>${esc(nxt.title)}</h2>
       <button class="big" data-a="start" data-id="${nxt.id}">Начать</button></div>`;
   }
   h += `<h3>План</h3><div class="plan">`;
