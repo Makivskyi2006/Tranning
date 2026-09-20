@@ -218,11 +218,17 @@ function updateWarm(ei) {
     : '';
 }
 
+const DAY_LABELS = { 1: 'Спина, бицепс', 2: 'Грудь, плечи, трицепс', 3: 'Ноги' };
+function dayLabel(l) {
+  if (/^l1/.test(l.wid)) return 'Разгрузка: спина, грудь, руки';
+  if (/^l3/.test(l.wid)) return 'Разгрузка: ноги, плечи';
+  const m = /d(\d)$/.exec(l.wid || '');
+  return (m && DAY_LABELS[m[1]]) || l.title;
+}
 function vHistory() {
   if (!S.logs.length) return `<h1>История</h1><p class="empty">Пусто</p>`;
   return `<h1>История</h1>` + S.logs.slice().reverse().map(l => {
-    const vol = l.ex.reduce((n, e) => n + e.sets.reduce((m, s) => m + s.w * s.r, 0), 0);
-    return `<details class="card"><summary><b>${esc(l.title)}</b><small>${dLong(l.date)} · ${Math.round(vol).toLocaleString('ru-RU')} кг</small></summary>
+    return `<details class="card"><summary><b>${esc(dayLabel(l))}</b><small>${dLong(l.date)}</small></summary>
       ${l.ex.map(e => `<div class="hx"><b>${esc(e.name)}</b><span>${e.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}
       <button class="link dim" data-a="dellog" data-id="${l.id}">Удалить</button></details>`;
   }).join('');
