@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Тренировки">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Тренировки</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="top"><span>Тренировки</span><button id="tBtn" aria-label="Таймер">⏱</button></header>
+<main id="app"></main>
+
+<div id="timer">
+  <div id="tFill"></div>
+  <div class="tin">
+    <button data-a="tadd" data-s="-15">−15</button>
+    <span id="tLeft">0:00</span>
+    <button data-a="tadd" data-s="15">+15</button>
+    <button data-a="tstop" class="x">Пропустить</button>
+  </div>
+</div>
+
+<nav id="tabs">
+  <button data-v="home" class="on"><i>🏋️</i>Тренировка</button>
+  <button data-v="history"><i>🗓</i>История</button>
+  <button data-v="progress"><i>📈</i>Прогресс</button>
+  <button data-v="more"><i>⚙️</i>Ещё</button>
+</nav>
+<div id="sheet"></div>
+<div id="toast"></div>
+
+<script src="program.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
