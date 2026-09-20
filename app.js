@@ -152,8 +152,7 @@ function render() {
 function vHome() {
   const nxt = wByPos();
   const a = S.active;
-  const wk = S.logs.filter(l => Date.now() - new Date(l.date) < 7 * 864e5).length;
-  let h = `<div class="stats"><div><b>${wk}</b><span>7 дней</span></div><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>неделя</span></div></div>`;
+  let h = `<div class="stats"><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>неделя</span></div></div>`;
   if (a) {
     h += `<div class="hero"><h2>${esc(a.title)}</h2>
       <button class="big" data-a="resume">Продолжить</button></div>`;
