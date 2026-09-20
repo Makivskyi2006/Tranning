@@ -96,3 +96,6 @@ dl{margin:0;font-size:14px}dt{font-weight:700;color:var(--acc);margin-top:10px}d
 #toast.on{opacity:1}
 @media (min-width:600px){body{background:#0a0a0a}}
 .warm:empty{display:none}
+
+#tabs svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#tabs button{padding-top:4px}
