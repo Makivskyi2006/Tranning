@@ -300,7 +300,8 @@ function vSheet() {
     return `<div class="panel"><h2>Готово</h2>
       <div class="stats"><div><b>${l.dur}</b><span>мин</span></div><div><b>${Math.round(sheet.volume).toLocaleString('ru-RU')}</b><span>кг</span></div><div><b>${l.ex.reduce((n, e) => n + e.sets.length, 0)}</b><span>подх.</span></div></div>
       ${sheet.prs.length ? `<div class="prs"><b>Новые рекорды</b>${sheet.prs.map(n => `<div>${esc(n)}</div>`).join('')}</div>` : ''}
-      <button class="big" data-a="closesheet">Ок</button></div>`;
+      <button class="big" data-a="export">Отправить копию</button>
+      <button class="big alt" data-a="closesheet">Закрыть</button></div>`;
   }
   if (sheet.type === 'timer') {
     return `<div class="panel"><h2>Таймер</h2><div class="seg t grid">${[30, 60, 90, 120, 180, 240, 300].map(s => `<button data-a="tstart" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
