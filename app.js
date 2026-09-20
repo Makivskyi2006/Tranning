@@ -301,7 +301,7 @@ function vSheet() {
       <button class="big" data-a="closesheet">Ок</button></div>`;
   }
   if (sheet.type === 'timer') {
-    return `<div class="panel"><h2>Таймер</h2><div class="seg t big">${[30, 60, 90, 120, 180, 240, 300].map(s => `<button data-a="tstart" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
+    return `<div class="panel"><h2>Таймер</h2><div class="seg t grid">${[30, 60, 90, 120, 180, 240, 300].map(s => `<button data-a="tstart" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
       <button class="big alt" data-a="closesheet">Закрыть</button></div>`;
   }
   return '';

@@ -70,7 +70,9 @@ details[open] summary{margin-bottom:8px}
 .chart{width:100%;height:auto;margin-top:8px}.chart .g{stroke:var(--line);stroke-width:1}.chart .ax{fill:var(--dim);font-size:10px}
 .chart .ln{fill:none;stroke:var(--acc2);stroke-width:2.5;stroke-linejoin:round}.chart .ar{fill:rgba(255,255,255,.07)}.chart .pt{fill:var(--bg);stroke:var(--acc2);stroke-width:2}
 .seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{flex:1;min-width:60px;min-height:46px;border-radius:12px;background:var(--card2);font-weight:600}
-.seg button.on{background:var(--acc2);color:#111}.seg.big button{min-height:56px;font-size:20px;flex:1 0 30%}
+.seg button.on{background:var(--acc2);color:#111}.seg.grid button{min-height:60px;font-size:22px;flex:1 0 28%;color:var(--tx)}
+.seg button{color:var(--tx)}
+.seg button.on{color:#000}
 dl{margin:0;font-size:14px}dt{font-weight:700;color:var(--acc);margin-top:10px}dd{margin:2px 0 0;color:#d0d0d0}
 
 #timer{position:fixed;left:12px;right:12px;bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 8px);z-index:30;background:var(--card2);border-radius:18px;overflow:hidden;display:none;}
