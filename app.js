@@ -26,11 +26,11 @@ try { navigator.storage && navigator.storage.persist && navigator.storage.persis
 
 /* ---------- утилиты ---------- */
 const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : NaN; };
-const fmt = n => (Math.round(n * 100) / 100).toString().replace('.', ',');
+const fmt = n => (Math.round(n * 100) / 100).toString();
 const r25 = n => Math.round(n / 2.5) * 2.5;
 const mmss = s => { s = Math.max(0, Math.ceil(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
-const dShort = iso => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
-const dLong = iso => new Date(iso).toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'long' });
+const dShort = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const dLong = iso => new Date(iso).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' });
 const repRange = t => { const m = String(t).match(/(\d+)(?:-(\d+))?/); return m ? [+m[1], +(m[2] || m[1])] : [0, 0]; };
 const e1rm = (w, r) => w * (1 + r / 30);
 const wByPos = () => WORKOUTS[((S.pos % WORKOUTS.length) + WORKOUTS.length) % WORKOUTS.length];
@@ -93,7 +93,7 @@ function freshEx(e) {
   const sets = [];
   for (let i = 0; i < e.sets; i++) {
     const ls = last ? last.ex.sets[Math.min(i, last.ex.sets.length - 1)] : null;
-    sets.push({ w: ls ? String(ls.w).replace('.', ',') : '', r: ls ? String(ls.r) : '', done: false });
+    sets.push({ w: ls ? String(ls.w) : '', r: ls ? String(ls.r) : '', done: false });
   }
   return { name: e.name, sets };
 }
@@ -127,11 +127,11 @@ function finishWorkout() {
     sets: e.sets.filter(s => s.done).map(s => ({ w: num(s.w) || 0, r: num(s.r) || 0 })),
   })).filter(e => e.sets.length);
   if (!ex.length) {
-    if (confirm('Сбросить тренировку?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); }
+    if (confirm('Discard workout?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); }
     return;
   }
   const left = a.ex.reduce((n, e) => n + e.sets.filter(s => !s.done).length, 0);
-  if (left && !confirm(`Не отмечено: ${left}. Завершить?`)) return;
+  if (left && !confirm(`${left} sets not done. Finish?`)) return;
 
   // рекорды: сравниваем расчётный максимум на 1 повторение с прошлыми тренировками
   const prs = [];
@@ -168,21 +168,21 @@ function render() {
 function vHome() {
   const nxt = wByPos();
   const a = S.active;
-  let h = `<div class="stats"><div><b>${S.logs.length}</b><span>всего</span></div><div><b>${S.cycle}</b><span>неделя</span></div></div>`;
+  let h = `<div class="stats"><div><b>${S.logs.length}</b><span>total</span></div><div><b>${S.cycle}</b><span>week</span></div></div>`;
   if (a) {
     h += `<div class="hero"><h2>${esc(a.title)}</h2>
-      <button class="big" data-a="resume">Продолжить</button></div>`;
+      <button class="big" data-a="resume">Continue</button></div>`;
   } else {
     h += `<div class="hero"><h2>${esc(nxt.title)}</h2>
-      <button class="big" data-a="start" data-id="${nxt.id}">Начать</button></div>`;
+      <button class="big" data-a="start" data-id="${nxt.id}">Start</button></div>`;
   }
-  h += `<h3>План</h3><div class="plan">`;
+  h += `<h3>Plan</h3><div class="plan">`;
   WORKOUTS.forEach((w, i) => {
     const done = i < S.pos % WORKOUTS.length, isNext = i === S.pos % WORKOUTS.length;
     h += `<button class="row ${done ? 'done' : ''} ${isNext ? 'next' : ''}" data-a="pick" data-i="${i}">
       <span>${done ? '✓' : isNext ? '▶' : '•'}</span><span>${esc(w.title)}</span></button>`;
   });
-  h += `<div class="blk">Разгрузка</div>` + EXTRA.map(w => `<button class="row" data-a="start" data-id="${w.id}"><span>•</span><span>${esc(w.title.replace('Разгрузка · ', ''))}</span></button>`).join('');
+  h += `<div class="blk">Deload</div>` + EXTRA.map(w => `<button class="row" data-a="start" data-id="${w.id}"><span>•</span><span>${esc(w.title.replace('Deload · ', ''))}</span></button>`).join('');
   h += `</div>`;
   return h;
 }
@@ -190,63 +190,63 @@ function vHome() {
 function vWorkout() {
   const a = S.active, w = ALL_WORKOUTS.find(x => x.id === a.wid);
   const mins = Math.floor((Date.now() - a.startedAt) / 60000);
-  let h = `<button class="link back" data-a="home">← Назад</button>
-  <div class="wh"><div><h1>${esc(a.title)}</h1><small>${mins} мин · ${a.ex.reduce((n, e) => n + e.sets.filter(s => s.done).length, 0)}/${a.ex.reduce((n, e) => n + e.sets.length, 0)} подходов</small></div></div>`;
-  const wu = /^Ноги/.test(w.kind) ? WARMUP.lower : WARMUP.upper;
-  if (wu) h += `<a class="btn wide alt wu" href="${wu}" target="_blank" rel="noopener">Разминка</a>`;
+  let h = `<button class="link back" data-a="home">← Back</button>
+  <div class="wh"><div><h1>${esc(a.title)}</h1><small>${mins} min · ${a.ex.reduce((n, e) => n + e.sets.filter(s => s.done).length, 0)}/${a.ex.reduce((n, e) => n + e.sets.length, 0)} sets</small></div></div>`;
+  const wu = /^Legs/.test(w.kind) ? WARMUP.lower : WARMUP.upper;
+  if (wu) h += `<a class="btn wide alt wu" href="${wu}" target="_blank" rel="noopener">Warm-up</a>`;
   a.ex.forEach((e, ei) => {
     const p = w.ex[ei];
     const last = lastLogFor(e.name);
     const [, hi] = repRange(p.reps);
     let hint = '';
     if (last) {
-      hint = 'Было: ' + last.ex.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ');
-      if (!isNaN(hi) && hi && !/сек|макс/.test(p.reps) && last.ex.sets.length >= Math.min(p.sets, 2) && last.ex.sets.every(s => s.r >= hi))
-        hint += ` <b class="up">↑ добавь вес</b>`;
+      hint = 'Last: ' + last.ex.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ');
+      if (!isNaN(hi) && hi && !/sec|max/.test(p.reps) && last.ex.sets.length >= Math.min(p.sets, 2) && last.ex.sets.every(s => s.r >= hi))
+        hint += ` <b class="up">↑ add weight</b>`;
     }
     h += `<section class="card" data-e="${ei}">
-      <div class="exh"><div class="eh"><h2>${ei + 1}. ${esc(e.name)}</h2>${VIDEO[e.name] ? `<a class="vid" href="${VIDEO[e.name]}" target="_blank" rel="noopener" aria-label="Видео техники"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></a>` : ''}</div>
-        <div class="chips"><span>${p.sets}×${esc(p.reps)}</span><span>${p.rest >= 60 ? p.rest / 60 + ' мин' : p.rest + ' сек'}</span>${p.rir == null ? '' : `<span>ЗДО ${p.rir}</span>`}</div></div>
+      <div class="exh"><div class="eh"><h2>${ei + 1}. ${esc(exName(e.name))}</h2>${VIDEO[e.name] ? `<a class="vid" href="${VIDEO[e.name]}" target="_blank" rel="noopener" aria-label="Technique video"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></a>` : ''}</div>
+        <div class="chips"><span>${p.sets}×${esc(p.reps)}</span><span>${p.rest >= 60 ? p.rest / 60 + ' min' : p.rest + ' sec'}</span>${p.rir == null ? '' : `<span>RIR ${p.rir}</span>`}</div></div>
       ${hint ? `<div class="last">${hint}</div>` : ''}
       ${p.note ? `<div class="note">${esc(p.note)}</div>` : ''}
       ${p.warm ? `<div class="warm" id="warm${ei}"></div>` : ''}
       <div class="sets">${e.sets.map((s, si) => setRow(ei, si, s)).join('')}</div>
-      <button class="link" data-a="addset" data-e="${ei}">+ подход</button>
-      ${e.sets.length > 1 ? `<button class="link dim" data-a="delset" data-e="${ei}">− подход</button>` : ''}
+      <button class="link" data-a="addset" data-e="${ei}">+ set</button>
+      ${e.sets.length > 1 ? `<button class="link dim" data-a="delset" data-e="${ei}">− set</button>` : ''}
     </section>`;
   });
-  h += `<button class="big fin" data-a="finish">Завершить</button>
-        <button class="link dim center" data-a="cancel">Отмена</button>`;
+  h += `<button class="big fin" data-a="finish">Finish</button>
+        <button class="link dim center" data-a="cancel">Cancel</button>`;
   return h;
 }
 function setRow(ei, si, s) {
   return `<div class="set ${s.done ? 'ok' : ''}" data-s="${si}">
     <span class="n">${si + 1}</span>
-    <div class="num"><button data-a="step" data-d="-1" tabindex="-1">−</button><input data-k="w" inputmode="decimal" placeholder="кг" value="${esc(s.w)}"><button data-a="step" data-d="1" tabindex="-1">+</button></div>
-    <div class="num r"><button data-a="rstep" data-d="-1" tabindex="-1">−</button><input data-k="r" inputmode="numeric" placeholder="повт" value="${esc(s.r)}"><button data-a="rstep" data-d="1" tabindex="-1">+</button></div>
-    <button class="chk" data-a="done" aria-label="Готово">✓</button></div>`;
+    <div class="num"><button data-a="step" data-d="-1" tabindex="-1">−</button><input data-k="w" inputmode="decimal" placeholder="kg" value="${esc(s.w)}"><button data-a="step" data-d="1" tabindex="-1">+</button></div>
+    <div class="num r"><button data-a="rstep" data-d="-1" tabindex="-1">−</button><input data-k="r" inputmode="numeric" placeholder="reps" value="${esc(s.r)}"><button data-a="rstep" data-d="1" tabindex="-1">+</button></div>
+    <button class="chk" data-a="done" aria-label="Done">✓</button></div>`;
 }
 function updateWarm(ei) {
   const el = $('#warm' + ei); if (!el) return;
   const w = num(S.active.ex[ei].sets[0].w);
   el.innerHTML = w > 0
-    ? `<b>Разминка</b> ${fmt(r25(w * .4))}×8-10 · ${fmt(r25(w * .7))}×4-5 · ${fmt(r25(w * .9))}×2`
+    ? `<b>Warm-up</b> ${fmt(r25(w * .4))}×8-10 · ${fmt(r25(w * .7))}×4-5 · ${fmt(r25(w * .9))}×2`
     : '';
 }
 
-const DAY_LABELS = { 1: 'Спина, бицепс', 2: 'Грудь, плечи, трицепс', 3: 'Ноги' };
+const DAY_LABELS = { 1: 'Back, biceps', 2: 'Chest, shoulders, triceps', 3: 'Legs' };
 function dayLabel(l) {
-  if (/^l1/.test(l.wid)) return 'Разгрузка: спина, грудь, руки';
-  if (/^l3/.test(l.wid)) return 'Разгрузка: ноги, плечи';
+  if (/^l1/.test(l.wid)) return 'Deload: back, chest, arms';
+  if (/^l3/.test(l.wid)) return 'Deload: legs, shoulders';
   const m = /d(\d)$/.exec(l.wid || '');
   return (m && DAY_LABELS[m[1]]) || l.title;
 }
 function vHistory() {
-  if (!S.logs.length) return `<h1>История</h1><p class="empty">Пусто</p>`;
-  return `<h1>История</h1>` + S.logs.slice().reverse().map(l => {
+  if (!S.logs.length) return `<h1>History</h1><p class="empty">Empty</p>`;
+  return `<h1>History</h1>` + S.logs.slice().reverse().map(l => {
     return `<details class="card"><summary><b>${esc(dayLabel(l))}</b><small>${dLong(l.date)}</small></summary>
-      ${l.ex.map(e => `<div class="hx"><b>${esc(e.name)}</b><span>${e.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}
-      <button class="link dim" data-a="dellog" data-id="${l.id}">Удалить</button></details>`;
+      ${l.ex.map(e => `<div class="hx"><b>${esc(exName(e.name))}</b><span>${e.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}
+      <button class="link dim" data-a="dellog" data-id="${l.id}">Delete</button></details>`;
   }).join('');
 }
 
@@ -263,20 +263,20 @@ function vProgress() {
   const names = [...new Set(S.logs.flatMap(l => l.ex.map(e => e.name)))];
   const items = names.map(n => ({ n, p: exStats(n) })).sort((a, b) => b.p[b.p.length - 1].d.localeCompare(a.p[a.p.length - 1].d));
   const bw = S.body.slice(-30);
-  let h = `<h1>Прогресс</h1>
-  <section class="card"><h2>Вес тела</h2>
-    <div class="bw"><input id="bwIn" inputmode="decimal" placeholder="кг"><button class="btn" data-a="bw">Записать</button></div>
-    ${bw.length > 1 ? chart(bw.map(b => ({ d: b.d, v: b.v })), 'кг') : ''}
-    ${bw.length ? `<div class="last"><b>${fmt(bw[bw.length - 1].v)} кг</b> · ${dShort(bw[bw.length - 1].d)}</div>` : ''}
+  let h = `<h1>Progress</h1>
+  <section class="card"><h2>Body weight</h2>
+    <div class="bw"><input id="bwIn" inputmode="decimal" placeholder="kg"><button class="btn" data-a="bw">Log</button></div>
+    ${bw.length > 1 ? chart(bw.map(b => ({ d: b.d, v: b.v })), 'kg') : ''}
+    ${bw.length ? `<div class="last"><b>${fmt(bw[bw.length - 1].v)} kg</b> · ${dShort(bw[bw.length - 1].d)}</div>` : ''}
   </section>`;
-  if (!items.length) return h + `<p class="empty">Пусто</p>`;
+  if (!items.length) return h + `<p class="empty">Empty</p>`;
   const rowOf = ({ n, p }) => {
     const f = p[0], l = p[p.length - 1], diff = l.w - f.w;
-    return `<button class="row ex" data-a="openex" data-n="${esc(n)}"><span class="t">${esc(n)}</span><span class="v"><b>${fmt(l.w)} кг</b>${p.length > 1 ? `<i class="${diff >= 0 ? 'pos' : 'neg'}">${signed(diff)}</i>` : ''}</span></button>`;
+    return `<button class="row ex" data-a="openex" data-n="${esc(n)}"><span class="t">${esc(exName(n))}</span><span class="v"><b>${fmt(l.w)} kg</b>${p.length > 1 ? `<i class="${diff >= 0 ? 'pos' : 'neg'}">${signed(diff)}</i>` : ''}</span></button>`;
   };
   [...GROUPS, 'Другое'].forEach(g => {
     const list = items.filter(it => groupOf(it.n) === g);
-    if (list.length) h += `<h3>${g}</h3>` + list.map(rowOf).join('');
+    if (list.length) h += `<h3>${GROUP_EN[g] || g}</h3>` + list.map(rowOf).join('');
   });
   return h;
 }
@@ -284,11 +284,11 @@ const signed = n => (n > 0 ? '+' : n < 0 ? '−' : '') + fmt(Math.abs(n));
 function vEx() {
   const p = exStats(exSel);
   const bestW = Math.max(...p.map(x => x.w)), bestE = Math.max(...p.map(x => x.e));
-  return `<button class="link back" data-a="back">← Назад</button><h1>${esc(exSel)}</h1>
-  <div class="stats"><div><b>${fmt(bestW)}</b><span>макс, кг</span></div><div><b>${fmt(bestE)}</b><span>1ПМ, кг</span></div><div><b>${p.length}</b><span>раз</span></div></div>
-  <section class="card"><h2>Вес</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.w })), 'кг') : ''}</section>
-  <section class="card"><h2>1ПМ</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.e })), 'кг') : ''}</section>
-  <h3>Записи</h3>${p.slice().reverse().map(x => `<div class="hx"><b>${dShort(x.d)}</b><span>${x.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}`;
+  return `<button class="link back" data-a="back">← Back</button><h1>${esc(exName(exSel))}</h1>
+  <div class="stats"><div><b>${fmt(bestW)}</b><span>max, kg</span></div><div><b>${fmt(bestE)}</b><span>1RM, kg</span></div><div><b>${p.length}</b><span>sessions</span></div></div>
+  <section class="card"><h2>Weight</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.w })), 'kg') : ''}</section>
+  <section class="card"><h2>1RM</h2>${p.length > 1 ? chart(p.map(x => ({ d: x.d, v: x.e })), 'kg') : ''}</section>
+  <h3>Log</h3>${p.slice().reverse().map(x => `<div class="hx"><b>${dShort(x.d)}</b><span>${x.sets.map(s => `${fmt(s.w)}×${s.r}`).join(' · ')}</span></div>`).join('')}`;
 }
 function chart(pts, unit) {
   const W = 340, H = 150, pl = 34, pr = 8, pt = 10, pb = 22;
@@ -298,7 +298,7 @@ function chart(pts, unit) {
   const y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
   const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
   const area = `${line} L${x(pts.length - 1).toFixed(1)},${H - pb} L${x(0).toFixed(1)},${H - pb} Z`;
-  return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="График">
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Chart">
     <line x1="${pl}" x2="${W - pr}" y1="${y(hi - (hi - lo) * .05)}" y2="${y(hi - (hi - lo) * .05)}" class="g"/><line x1="${pl}" x2="${W - pr}" y1="${H - pb}" y2="${H - pb}" class="g"/>
     <text x="${pl - 4}" y="${y(mx) + 4}" class="ax" text-anchor="end">${fmt(mx)}</text><text x="${pl - 4}" y="${y(mn) + 4}" class="ax" text-anchor="end">${fmt(mn)}</text>
     <path d="${area}" class="ar"/><path d="${line}" class="ln"/>
@@ -308,26 +308,26 @@ function chart(pts, unit) {
 }
 
 function vMore() {
-  return `<section class="card"><h2>Шаг веса</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)}</button>`).join('')}</div></section>
-  <section class="card"><h2>Таймер</h2><div class="seg t">${[30, 60, 90, 120, 180, 240].map(s => `<button data-a="tset" data-s="${s}">${mmss(s)}</button>`).join('')}</div></section>
-  <section class="card"><h2>Данные</h2>
-    <button class="btn wide" data-a="export">Сохранить копию</button>
-    <label class="btn wide alt">Восстановить<input type="file" id="imp" accept="application/json,.json" hidden></label>
-    <button class="btn wide danger" data-a="wipe">Стереть всё</button></section>`;
+  return `<section class="card"><h2>Weight step</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)}</button>`).join('')}</div></section>
+  <section class="card"><h2>Timer</h2><div class="seg t">${[30, 60, 90, 120, 180, 240].map(s => `<button data-a="tset" data-s="${s}">${mmss(s)}</button>`).join('')}</div></section>
+  <section class="card"><h2>Data</h2>
+    <button class="btn wide" data-a="export">Save backup</button>
+    <label class="btn wide alt">Restore<input type="file" id="imp" accept="application/json,.json" hidden></label>
+    <button class="btn wide danger" data-a="wipe">Erase all</button></section>`;
 }
 
 function vSheet() {
   if (sheet.type === 'summary') {
     const l = sheet.log;
-    return `<div class="panel"><h2>Готово</h2>
-      <div class="stats"><div><b>${l.dur}</b><span>мин</span></div><div><b>${Math.round(sheet.volume).toLocaleString('ru-RU')}</b><span>кг</span></div><div><b>${l.ex.reduce((n, e) => n + e.sets.length, 0)}</b><span>подх.</span></div></div>
-      ${sheet.prs.length ? `<div class="prs"><b>Новые рекорды</b>${sheet.prs.map(n => `<div>${esc(n)}</div>`).join('')}</div>` : ''}
-      <button class="big" data-a="export">Отправить копию</button>
-      <button class="big alt" data-a="closesheet">Закрыть</button></div>`;
+    return `<div class="panel"><h2>Done</h2>
+      <div class="stats"><div><b>${l.dur}</b><span>min</span></div><div><b>${Math.round(sheet.volume).toLocaleString('en-US')}</b><span>kg</span></div><div><b>${l.ex.reduce((n, e) => n + e.sets.length, 0)}</b><span>sets</span></div></div>
+      ${sheet.prs.length ? `<div class="prs"><b>New records</b>${sheet.prs.map(n => `<div>${esc(exName(n))}</div>`).join('')}</div>` : ''}
+      <button class="big" data-a="export">Send backup</button>
+      <button class="big alt" data-a="closesheet">Close</button></div>`;
   }
   if (sheet.type === 'timer') {
-    return `<div class="panel"><h2>Таймер</h2><div class="seg t grid">${[30, 60, 90, 120, 180, 240, 300].map(s => `<button data-a="tstart" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
-      <button class="big alt" data-a="closesheet">Закрыть</button></div>`;
+    return `<div class="panel"><h2>Timer</h2><div class="seg t grid">${[30, 60, 90, 120, 180, 240, 300].map(s => `<button data-a="tstart" data-s="${s}">${mmss(s)}</button>`).join('')}</div>
+      <button class="big alt" data-a="closesheet">Close</button></div>`;
   }
   return '';
 }
@@ -349,7 +349,7 @@ document.addEventListener('click', ev => {
       const s = A.ex[ei].sets[si], inp = row.querySelector(`[data-k="${a === 'step' ? 'w' : 'r'}"]`), d = +b.dataset.d;
       const cur = num(inp.value), step = a === 'step' ? S.step : 1;
       const nv = Math.max(0, (isNaN(cur) ? (a === 'step' ? 0 : 0) : cur) + d * step);
-      s[a === 'step' ? 'w' : 'r'] = a === 'step' ? String(nv).replace('.', ',') : String(nv);
+      s[a === 'step' ? 'w' : 'r'] = a === 'step' ? String(nv) : String(nv);
       inp.value = s[a === 'step' ? 'w' : 'r']; save(); if (si === 0) updateWarm(ei); return;
     }
     case 'done': {
@@ -370,7 +370,7 @@ document.addEventListener('click', ev => {
     case 'addset': { const ss = A.ex[ei].sets, l = ss[ss.length - 1]; ss.push({ w: l.w, r: l.r, done: false }); save(); keepScroll(); return; }
     case 'delset': { const ss = A.ex[ei].sets; if (ss.length > 1) ss.pop(); save(); keepScroll(); return; }
     case 'finish': finishWorkout(); return;
-    case 'cancel': if (confirm('Отменить тренировку?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); } return;
+    case 'cancel': if (confirm('Cancel workout?')) { S.active = null; save(); stopTimer(); view = 'home'; render(); } return;
     case 'closesheet': sheet = null; render(); return;
     case 'timersheet': sheet = { type: 'timer' }; render(); return;
     case 'tstart': sheet = null; startTimer(+b.dataset.s); render(); return;
@@ -380,11 +380,11 @@ document.addEventListener('click', ev => {
     case 'openex': exSel = b.dataset.n; view = 'ex'; render(); $('#app').scrollTop = 0; return;
     case 'back': view = 'progress'; render(); return;
     case 'home': view = 'home'; render(); $('#app').scrollTop = 0; return;
-    case 'dellog': if (confirm('Удалить запись?')) { S.logs = S.logs.filter(l => l.id !== b.dataset.id); save(); render(); } return;
-    case 'bw': { const v = num($('#bwIn').value); if (v > 20 && v < 400) { S.body.push({ d: new Date().toISOString(), v }); save(); render(); toast('Записано'); } else toast('Введи вес в кг'); return; }
+    case 'dellog': if (confirm('Delete entry?')) { S.logs = S.logs.filter(l => l.id !== b.dataset.id); save(); render(); } return;
+    case 'bw': { const v = num($('#bwIn').value); if (v > 20 && v < 400) { S.body.push({ d: new Date().toISOString(), v }); save(); render(); toast('Saved'); } else toast('Enter weight in kg'); return; }
     case 'stepset': S.step = +b.dataset.v; save(); render(); return;
     case 'export': exportData(); return;
-    case 'wipe': if (confirm('Стереть все данные?') && confirm('Точно стереть?')) { S = { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 }; save(); stopTimer(); view = 'home'; render(); } return;
+    case 'wipe': if (confirm('Erase all data?') && confirm('Really erase?')) { S = { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 }; save(); stopTimer(); view = 'home'; render(); } return;
   }
 });
 function keepScroll() { const y = $('#app').scrollTop; render(); $('#app').scrollTop = y; }
@@ -404,19 +404,19 @@ document.addEventListener('change', ev => {
     try {
       const d = JSON.parse(rd.result);
       if (!d || !Array.isArray(d.logs)) throw 0;
-      if (!confirm(`Заменить данные копией (${d.logs.length})?`)) return;
-      S = Object.assign({ pos: 0, cycle: 1, active: null, body: [], step: 2.5 }, d); save(); render(); toast('Восстановлено');
-    } catch (e) { alert('Не удалось прочитать файл'); }
+      if (!confirm(`Replace data with backup (${d.logs.length} workouts)?`)) return;
+      S = Object.assign({ pos: 0, cycle: 1, active: null, body: [], step: 2.5 }, d); save(); render(); toast('Restored');
+    } catch (e) { alert('Could not read file'); }
   };
   rd.readAsText(f); ev.target.value = '';
 });
 
 async function exportData() {
-  const name = `trening-${new Date().toISOString().slice(0, 10)}.json`;
+  const name = `workouts-${new Date().toISOString().slice(0, 10)}.json`;
   const blob = new Blob([JSON.stringify(S)], { type: 'application/json' });
   try {
     const file = new File([blob], name, { type: 'application/json' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Копия тренировок' }); return; }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Workout backup' }); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
 }

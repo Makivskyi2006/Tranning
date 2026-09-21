@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
@@ -7,38 +7,38 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Тренировки">
+<meta name="apple-mobile-web-app-title" content="Workouts">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>Тренировки</title>
-<link rel="stylesheet" href="style.css?v=16">
+<title>Workouts</title>
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 <main id="app"></main>
 
-<button id="tBtn" aria-label="Таймер"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5M12 3v3"/></svg></button>
+<button id="tBtn" aria-label="Timer"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5M12 3v3"/></svg></button>
 <div id="timer">
   <div id="tFill"></div>
   <div class="tin">
     <button data-a="tadd" data-s="-15">−15</button>
     <span id="tLeft">0:00</span>
     <button data-a="tadd" data-s="15">+15</button>
-    <button data-a="tstop" class="x">Пропустить</button>
+    <button data-a="tstop" class="x">Skip</button>
   </div>
 </div>
 
 <nav id="tabs">
-  <button data-v="home" class="on" aria-label="Тренировка"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9v6M5 6v12M19 6v12M22 9v6M5 12h14"/></svg></button>
-  <button data-v="history" aria-label="История"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
-  <button data-v="progress" aria-label="Прогресс"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M6 16v-5M11 16V6M16 16v-8M21 16v-3" transform="translate(-1 0)"/></svg></button>
-  <button data-v="more" aria-label="Ещё"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <button data-v="home" class="on" aria-label="Workout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9v6M5 6v12M19 6v12M22 9v6M5 12h14"/></svg></button>
+  <button data-v="history" aria-label="History"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+  <button data-v="progress" aria-label="Progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M6 16v-5M11 16V6M16 16v-8M21 16v-3" transform="translate(-1 0)"/></svg></button>
+  <button data-v="more" aria-label="More"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </nav>
 <div id="sheet"></div>
 <div id="toast"></div>
 
-<script src="program.js?v=16"></script>
-<script src="links.js?v=16"></script>
-<script src="app.js?v=16"></script>
+<script src="program.js?v=20"></script>
+<script src="links.js?v=20"></script>
+<script src="app.js?v=20"></script>
 </body>
 </html>
