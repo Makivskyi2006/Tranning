@@ -310,10 +310,6 @@ function chart(pts, unit) {
 function vMore() {
   return `<section class="card"><h2>Шаг веса</h2><div class="seg">${[1.25, 2.5, 5].map(v => `<button class="${S.step === v ? 'on' : ''}" data-a="stepset" data-v="${v}">${fmt(v)}</button>`).join('')}</div></section>
   <section class="card"><h2>Таймер</h2><div class="seg t">${[30, 60, 90, 120, 180, 240].map(s => `<button data-a="tset" data-s="${s}">${mmss(s)}</button>`).join('')}</div></section>
-  <section class="card"><h2>Памятка</h2><dl>
-    <dt>ЗДО</dt><dd>Запас до отказа: 0 — в отказ, 1 — за 1 повтор до него.</dd>
-    <dt>Дропсет</dt><dd>До максимума, −30% веса, снова до максимума, ещё раз.</dd>
-    <dt>Темп</dt><dd>Вверх быстро, вниз ~2 сек, полная амплитуда.</dd></dl></section>
   <section class="card"><h2>Данные</h2>
     <button class="btn wide" data-a="export">Сохранить копию</button>
     <label class="btn wide alt">Восстановить<input type="file" id="imp" accept="application/json,.json" hidden></label>
