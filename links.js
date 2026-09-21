@@ -4,6 +4,7 @@ const VIDEO = {
  "Вертикальная тяга блока широким хватом": "https://www.youtube.com/shorts/WVtkxdAoDqs",
  "Жим в Смите в наклоне": "https://www.youtube.com/shorts/UA2uuAElBcE",
  "Жим в Хаммере на низ груди": "https://www.youtube.com/shorts/ppVWVWaijPw",
+ "Жим гантелей лежа": "https://www.youtube.com/shorts/RF_Z4an3FTM",
  "Жим гантелей сидя": "https://www.youtube.com/shorts/_Hng2oWkj3w",
  "Жим ногами": "https://www.youtube.com/shorts/pdmAAyqaJos",
  "Мертвая тяга": "https://www.youtube.com/shorts/lmfltWWJDpM",
