@@ -88,22 +88,30 @@ function renderTimer() {
 setInterval(renderTimer, 250);
 
 /* ---------- тренировка ---------- */
+function freshEx(e) {
+  const last = lastLogFor(e.name);
+  const sets = [];
+  for (let i = 0; i < e.sets; i++) {
+    const ls = last ? last.ex.sets[Math.min(i, last.ex.sets.length - 1)] : null;
+    sets.push({ w: ls ? String(ls.w).replace('.', ',') : '', r: ls ? String(ls.r) : '', done: false });
+  }
+  return { name: e.name, sets };
+}
+
 function startWorkout(wid) {
   const w = ALL_WORKOUTS.find(x => x.id === wid);
-  S.active = {
-    wid, title: w.title, startedAt: Date.now(),
-    ex: w.ex.map(e => {
-      const last = lastLogFor(e.name);
-      const sets = [];
-      for (let i = 0; i < e.sets; i++) {
-        const ls = last ? last.ex.sets[Math.min(i, last.ex.sets.length - 1)] : null;
-        sets.push({ w: ls ? String(ls.w).replace('.', ',') : '', r: ls ? String(ls.r) : '', done: false });
-      }
-      return { name: e.name, sets };
-    }),
-  };
+  S.active = { wid, title: w.title, startedAt: Date.now(), ex: w.ex.map(freshEx) };
   save(); view = 'workout'; lockScreen(); render();
 }
+
+// незавершённая тренировка подхватывает актуальный список упражнений (подходы у совпадающих упражнений остаются)
+function syncActive() {
+  const a = S.active; if (!a) return;
+  const w = ALL_WORKOUTS.find(x => x.id === a.wid); if (!w) return;
+  const kept = w.ex.map(p => a.ex.find(e => e.name === p.name) || freshEx(p));
+  a.ex = kept; a.title = w.title; save();
+}
+syncActive();
 
 async function lockScreen() {
   try { if (navigator.wakeLock && S.active) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
