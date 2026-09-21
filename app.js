@@ -377,9 +377,9 @@ document.addEventListener('click', ev => {
     case 'tset': startTimer(+b.dataset.s); return;
     case 'tadd': if (timer) { timer.end += +b.dataset.s * 1000; timer.total += +b.dataset.s; timer.fired = false; renderTimer(); } return;
     case 'tstop': stopTimer(); return;
-    case 'openex': exSel = b.dataset.n; view = 'ex'; render(); window.scrollTo(0, 0); return;
+    case 'openex': exSel = b.dataset.n; view = 'ex'; render(); $('#app').scrollTop = 0; return;
     case 'back': view = 'progress'; render(); return;
-    case 'home': view = 'home'; render(); window.scrollTo(0, 0); return;
+    case 'home': view = 'home'; render(); $('#app').scrollTop = 0; return;
     case 'dellog': if (confirm('Удалить запись?')) { S.logs = S.logs.filter(l => l.id !== b.dataset.id); save(); render(); } return;
     case 'bw': { const v = num($('#bwIn').value); if (v > 20 && v < 400) { S.body.push({ d: new Date().toISOString(), v }); save(); render(); toast('Записано'); } else toast('Введи вес в кг'); return; }
     case 'stepset': S.step = +b.dataset.v; save(); render(); return;
@@ -387,7 +387,7 @@ document.addEventListener('click', ev => {
     case 'wipe': if (confirm('Стереть все данные?') && confirm('Точно стереть?')) { S = { pos: 0, cycle: 1, logs: [], active: null, body: [], step: 2.5 }; save(); stopTimer(); view = 'home'; render(); } return;
   }
 });
-function keepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
+function keepScroll() { const y = $('#app').scrollTop; render(); $('#app').scrollTop = y; }
 
 document.addEventListener('input', ev => {
   const inp = ev.target.closest('.set input'); if (!inp || !S.active) return;
@@ -422,7 +422,7 @@ async function exportData() {
 }
 
 document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
-  view = b.dataset.v; render(); window.scrollTo(0, 0);
+  view = b.dataset.v; render(); $('#app').scrollTop = 0;
 }));
 $('#tBtn').addEventListener('click', () => { unlockAudio(); sheet = { type: 'timer' }; render(); });
 
