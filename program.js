@@ -73,55 +73,6 @@ const GROUP_RULES = [
 ];
 const groupOf = name => (GROUP_RULES.find(([, re]) => re.test(name)) || ['Другое'])[0];
 
-// English display names (keys stay Russian so existing history keeps matching)
-const EN = {
- "Вертикальная тяга блока широким хватом": "Wide-grip lat pulldown",
- "Вертикальная тяга блока параллельным хватом": "Neutral-grip lat pulldown",
- "Вертикальная тяга блока узким хватом": "Close-grip lat pulldown",
- "Рычажная горизонтальная тяга по 1-й руке": "Single-arm plate-loaded row",
- "Пулловер в блоке с упором спиной": "Cable pullover (back supported)",
- "Горизонтальная тяга блока по 1-й руке": "Single-arm cable row",
- "Тяга гантелей с упором в скамью": "Chest-supported dumbbell row",
- "Горизонтальная тяга блока с акцентом на ширину": "Wide-grip cable row",
- "Тяга нижнего блока с упором в скамью": "Chest-supported low cable row",
- "Разведение на заднюю дельту в Peck-Deck": "Pec deck rear delt fly",
- "Разведение гантелей с упором в скамью (задняя дельта)": "Chest-supported rear delt fly",
- "Отведение в кроссовере по 1-й руке": "Single-arm cable lateral raise",
- "Отведение гантелей в стороны стоя": "Standing dumbbell lateral raise",
- "Отведение рук в кроссовере лежа": "Lying cable lateral raise",
- "Отведение гантелей с упором в скамью": "Chest-supported lateral raise",
- "Жим гантелей сидя": "Seated dumbbell shoulder press",
- "Жим в Смите в наклоне": "Incline Smith press",
- "Жим в Хаммере на низ груди": "Hammer press (lower chest)",
- "Жим в Хаммере на верх груди": "Hammer press (upper chest)",
- "Сведение в кроссовере лежа на наклонной скамье": "Incline cable fly",
- "Жим гантелей в наклоне": "Incline dumbbell press",
- "Сведение в Peck-Deck на низ груди": "Pec deck fly (lower chest)",
- "Сведение в Peck-Deck на верх груди": "Pec deck fly (upper chest)",
- "Протяжка с нижнего блока": "Low-pulley cable fly",
- "Жим гантелей лежа": "Flat dumbbell press",
- "Сведение в кроссовере стоя": "Standing cable fly",
- "Сгибания рук в тренажере Скотта": "Preacher curl machine",
- "Молотки с канатом": "Rope hammer curl",
- "Подъем гантелей на бицепс сидя на наклонной скамье": "Seated incline dumbbell curl",
- "Сгибания рук с нижнего блока": "Low cable curl",
- "Подъем штанги на бицепс": "Barbell curl",
- "Разгибания в блоке с прямой рукоятью": "Triceps pushdown (straight bar)",
- "Разгибания из-за головы в блоке": "Overhead cable triceps extension",
- "Разгибания в блоке по 1-й руке": "Single-arm cable extension",
- "Разгибания с гантелью из-за головы по 1-й руке": "Single-arm overhead dumbbell extension",
- "Разгибания из-за головы в блоке по 1-й руке": "Single-arm overhead cable extension",
- "Приседания в Гакке": "Hack squat",
- "Приседания в Смите": "Smith machine squat",
- "Сгибания ног на бицепс бедра в тренажере стоя по 1-й ноге": "Standing single-leg hamstring curl",
- "Разгибания ног в тренажере": "Leg extension",
- "Жим ногами": "Leg press",
- "Подъемы на носки в тренажере стоя / в Смите": "Standing calf raise",
- "Подъемы на носки в тренажере сидя": "Seated calf raise",
- "Мертвая тяга": "Deadlift",
- "Выпады с гантелями / штангой": "Lunges (dumbbell / barbell)",
- "Молитва в блоке": "Cable crunch",
- "Подъемы ног в висе": "Hanging leg raise"
-};
-const exName = n => EN[n] || n;
+// Exercise names stay in Russian (as in the original program)
+const exName = n => n;
 const GROUP_EN = { 'Грудь': 'Chest', 'Спина': 'Back', 'Плечи': 'Shoulders', 'Бицепс': 'Biceps', 'Трицепс': 'Triceps', 'Ноги': 'Legs', 'Пресс': 'Abs', 'Другое': 'Other' };
