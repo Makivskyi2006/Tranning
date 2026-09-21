@@ -55,7 +55,7 @@ const day = (n, kind, title, ex) => ({ id: `h1d${n}`, block: 'Программа
 const light = (n, kind, ex) => ({ id: `l${n}`, block: 'Разгрузка', kind, ex, title: `Разгрузка · ${kind}` });
 
 // Одна неделя, повторяется по кругу
-const WORKOUTS = [day(1, 'Тяни', 'Спина, бицепс', PULL_A), day(2, 'Толкай', 'Грудь, плечи, трицепс', PUSH_A), day(3, 'Ноги', 'Ноги', LEGS_A)];
+const WORKOUTS = [day(2, 'Толкай', 'Грудь, плечи, трицепс', PUSH_A), day(1, 'Тяни', 'Спина, бицепс', PULL_A), day(3, 'Ноги', 'Ноги', LEGS_A)];
 // Разгрузочная неделя: включается вручную из плана
 const EXTRA = [light(1, 'Спина, грудь, руки', LIGHT_1), light(3, 'Ноги, плечи', LIGHT_2)];
 const ALL_WORKOUTS = [...WORKOUTS, ...EXTRA];

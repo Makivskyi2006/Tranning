@@ -10,6 +10,14 @@ let S = (() => {
 })();
 // миграция со старой 5-недельной версии: вернуть позицию в круг из трёх и сбросить незавершённую старую тренировку
 S.pos = ((S.pos % WORKOUTS.length) + WORKOUTS.length) % WORKOUTS.length;
+// один раз: позиция в круге = следующая после последней выполненной тренировки (порядок дней изменился)
+if (S.order !== 2) {
+  for (let i = S.logs.length - 1; i >= 0; i--) {
+    const k = WORKOUTS.findIndex(w => w.id === S.logs[i].wid);
+    if (k >= 0) { S.pos = (k + 1) % WORKOUTS.length; break; }
+  }
+  S.order = 2;
+}
 if (S.active && !ALL_WORKOUTS.some(x => x.id === S.active.wid)) S.active = null;
 let view = 'home', exSel = null, timer = null, wakeLock = null, sheet = null;
 
